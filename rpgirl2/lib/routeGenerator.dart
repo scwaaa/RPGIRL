@@ -1,0 +1,54 @@
+// route_generator.dart
+import 'package:flutter/material.dart';
+import 'package:rpgirl2/config/auth_wrapper.dart';
+import 'package:rpgirl2/pages/HomeBase.dart';
+import 'package:rpgirl2/pages/LoginPage.dart';
+import 'package:rpgirl2/pages/homepages/inventory.dart';
+import 'package:rpgirl2/pages/homepages/social.dart';
+import 'package:rpgirl2/pages/homepages/messages.dart';
+import 'package:rpgirl2/widgets/chat.dart';
+import 'package:rpgirl2/widgets/settingScreen.dart';
+import 'package:rpgirl2/pages/SignupPage.dart';
+import 'package:rpgirl2/quickplay.dart';
+
+class RouteGenerator {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    final args = settings.arguments;
+
+    switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(builder: (_) => AuthWrapper());
+      case '/signup':
+        return MaterialPageRoute(builder: (_) => SignupScreen());
+      case '/home':
+        return MaterialPageRoute(builder: (_) => Home());
+      case "/inventory":
+        return MaterialPageRoute(builder: (_) => InventoryPage());
+      case "/friends":
+        return MaterialPageRoute(builder: (_) => SocialPage());
+      case "/messages":
+        return MaterialPageRoute(builder: (_) => messagesScreen());
+      case "/chat":
+        return MaterialPageRoute(builder: (_) => ChatScreen());
+      case "/settings":
+        return MaterialPageRoute(builder: (_) => settingScreen());
+      case "/quickplay":
+        return MaterialPageRoute(builder: (_) => QuickplayScreen());
+      default:
+        return _errorRoute();
+    }
+  }
+
+  static Route<dynamic> _errorRoute() {
+    return MaterialPageRoute(builder: (_) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Error'),
+        ),
+        body: Center(
+          child: Text('ERROR'),
+        ),
+      );
+    });
+  }
+}
