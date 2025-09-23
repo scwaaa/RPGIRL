@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'auth_service.dart';
 import 'package:rpgirl2/pages/LoginPage.dart';
 import 'package:rpgirl2/pages/HomeBase.dart'; // Import your Home widget
-
+import 'package:rpgirl2/pages/authScreen.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -25,7 +25,7 @@ class AuthWrapper extends StatelessWidget {
         } else if (snapshot.hasData && snapshot.data == true) {
           return Home(); // User is logged in, show home page
         } else {
-          return LoginPage(); // User is not logged in, show login page
+          return Authpage(); // User is not logged in, show login page
         }
       },
     );

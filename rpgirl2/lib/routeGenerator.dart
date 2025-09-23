@@ -8,7 +8,6 @@ import 'package:rpgirl2/pages/homepages/social.dart';
 import 'package:rpgirl2/pages/homepages/messages.dart';
 import 'package:rpgirl2/widgets/chat.dart';
 import 'package:rpgirl2/widgets/settingScreen.dart';
-import 'package:rpgirl2/pages/SignupPage.dart';
 import 'package:rpgirl2/quickplay.dart';
 
 class RouteGenerator {
@@ -18,8 +17,6 @@ class RouteGenerator {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) => AuthWrapper());
-      case '/signup':
-        return MaterialPageRoute(builder: (_) => SignupScreen());
       case '/home':
         return MaterialPageRoute(builder: (_) => Home());
       case "/inventory":

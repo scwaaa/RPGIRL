@@ -1,28 +1,92 @@
-///File download from FlutterViz- Drag and drop a tools. For more details visit https://flutterviz.io/
-
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
+import 'package:rpgirl2/config/auth_service.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
+  final VoidCallback onSignInPressed;
+
+  const SignupScreen({super.key, required this.onSignInPressed});
+
+  @override
+  _SignupScreenState createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+
+  Future<void> _register() async {
+    // Basic validation
+    if (_usernameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a username')),
+      );
+      return;
+    }
+
+    if (_emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter an email')),
+      );
+      return;
+    }
+
+    if (_passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a password')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      await authService.register(
+        _emailController.text.trim(),
+        _passwordController.text,
+        _usernameController.text.trim(),
+      );
+      
+      // Navigate to home after successful registration
+      Navigator.pushNamedAndRemoveUntil(
+        context, 
+        '/home', 
+        (route) => false
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration failed: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff0420a9),
+      backgroundColor: Colors.transparent,
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Lottie.network(
-              "https://lottie.host/25d91c54-8cb0-4bd2-bdb2-d5622a3bebbb/jxeDFH40aG.json",
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
-              repeat: false,
-              animate: true,
-              
-            ),
             Align(
               alignment: Alignment.center,
               child: Padding(
@@ -47,7 +111,7 @@ class SignupScreen extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.fromLTRB(0, 50, 0, 16),
                         child: TextField(
-                          controller: TextEditingController(),
+                          controller: _usernameController,
                           obscureText: false,
                           textAlign: TextAlign.start,
                           maxLines: 1,
@@ -91,7 +155,7 @@ class SignupScreen extends StatelessWidget {
                         ),
                       ),
                       TextField(
-                        controller: TextEditingController(),
+                        controller: _emailController,
                         obscureText: false,
                         textAlign: TextAlign.start,
                         maxLines: 1,
@@ -136,8 +200,8 @@ class SignupScreen extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.fromLTRB(0, 16, 0, 30),
                         child: TextField(
-                          controller: TextEditingController(),
-                          obscureText: true,
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
                           textAlign: TextAlign.start,
                           maxLines: 1,
                           style: TextStyle(
@@ -176,31 +240,39 @@ class SignupScreen extends StatelessWidget {
                                 vertical: 8, horizontal: 12),
                             prefixIcon: Icon(Icons.lock,
                                 color: Color(0xff8a0ad5), size: 24),
-                            suffixIcon: Icon(Icons.visibility,
-                                color: Color(0xff97989a), size: 24),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                color: Color(0xff97989a),
+                                size: 24,
+                              ),
+                              onPressed: _togglePasswordVisibility,
+                            ),
                           ),
                         ),
                       ),
-                      MaterialButton(
-                        onPressed: () {},
-                        color: Color(0xff8a0ad5),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(22.0),
-                        ),
-                        padding: EdgeInsets.all(16),
-                        child: Text(
-                          "Create Account",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            fontStyle: FontStyle.normal,
-                          ),
-                        ),
-                        textColor: Color(0xffffffff),
-                        height: 50,
-                        minWidth: MediaQuery.of(context).size.width,
-                      ),
+                      _isLoading
+                          ? CircularProgressIndicator()
+                          : MaterialButton(
+                              onPressed: _register,
+                              color: Color(0xff8a0ad5),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(22.0),
+                              ),
+                              padding: EdgeInsets.all(16),
+                              child: Text(
+                                "Create Account",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  fontStyle: FontStyle.normal,
+                                ),
+                              ),
+                              textColor: Color(0xffffffff),
+                              height: 50,
+                              minWidth: MediaQuery.of(context).size.width,
+                            ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
                         child: Row(
@@ -220,9 +292,7 @@ class SignupScreen extends StatelessWidget {
                               ),
                             ),
                             MaterialButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
+                              onPressed: widget.onSignInPressed,
                               color: Color(0x00ffffff),
                               elevation: 0,
                               shape: RoundedRectangleBorder(

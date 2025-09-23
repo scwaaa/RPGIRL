@@ -178,21 +178,21 @@ class _HomeState extends State<Home> {
                 ),
                 child: Column(
                   children: [
-                    _buildMenuItem(RpgAwesome.player, 'Solo', () {
+                    _buildMenuItem(RpgAwesome.player, 'Practice', () {
                       _toggleBottomMenu();
                        Navigator.of(context).pushNamed(
                           '/quickplay',
                         );
                     }),
                     Divider(height: 1),
-                    _buildMenuItem(Icons.gamepad, 'Quick Play', () {
+                    _buildMenuItem(Icons.gamepad, 'Create / Join Room', () {
                       _toggleBottomMenu();
                       Navigator.of(context).pushNamed(
                           '/quickplay',
                         );
                     }),
                     Divider(height: 1),
-                    _buildMenuItem(RpgAwesome.crossed_swords, 'Create Room', () {
+                    _buildMenuItem(RpgAwesome.crossed_swords, 'Event', () {
                       _toggleBottomMenu();
                     }),
                     

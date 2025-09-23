@@ -7,7 +7,9 @@ import 'package:rpgirl2/config/auth_service.dart';
 import 'package:fluttericon/rpg_awesome_icons.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final VoidCallback onSignUpPressed; // Add this line
+
+  const LoginPage({super.key, required this.onSignUpPressed}); // Modify constructor
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -47,22 +49,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff8a0ad5),
+      backgroundColor: Colors.transparent,
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Lottie.network(
-              "https://lottie.host/25d91c54-8cb0-4bd2-bdb2-d5622a3bebbb/jxeDFH40aG.json",
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
-              repeat: true,
-              animate: true,
-              
-            ),
             Align(
               alignment: Alignment.center,
               child: Padding(
@@ -220,7 +213,6 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                       ),
-                      // Rest of your login page UI...
                       Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -238,11 +230,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         MaterialButton(
-                          onPressed: () {
-                             Navigator.of(context).pushNamed(
-                          '/signup',
-                        );
-                          },
+                          onPressed: widget.onSignUpPressed, // Use the callback here
                           color: Color(0x00ffffff),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -311,7 +299,6 @@ class _LoginPageState extends State<LoginPage> {
                             iconSize: 40,
                           ),
                         ),
-                      
                       ],
                     ),
                     ],
