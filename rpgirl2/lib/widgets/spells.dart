@@ -20,7 +20,7 @@ class SpellsPage extends StatelessWidget {
         ),
         children: [
           Container(
-            alignment: Alignment.bottomCenter,
+            alignment: Alignment.center,
             margin: EdgeInsets.all(0),
             padding: EdgeInsets.all(0),
             width: MediaQuery.of(context).size.width,
@@ -31,7 +31,7 @@ class SpellsPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -39,7 +39,7 @@ class SpellsPage extends StatelessWidget {
                   alignment: Alignment.center,
                   margin: EdgeInsets.all(0),
                   padding: EdgeInsets.all(0),
-                  width: MediaQuery.of(context).size.width,
+                  width: (MediaQuery.of(context).size.width * 0.40),
                   decoration: BoxDecoration(
                     color: Color(0x7fffffff),
                     shape: BoxShape.rectangle,

@@ -1,4 +1,6 @@
+// auth_service.dart
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 
 class AuthService {
   final Account account;
@@ -26,6 +28,44 @@ class AuthService {
       await account.createEmailPasswordSession(email: email, password: password);
     } catch (e) {
       throw Exception('Login failed: $e');
+    }
+  }
+
+  Future<User> getCurrentUser() async {
+    try {
+      return await account.get();
+    } catch (e) {
+      throw Exception('Failed to get user: $e');
+    }
+  }
+
+  Future<bool> isEmailVerified() async {
+    try {
+      final user = await account.get();
+      return user.emailVerification;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> sendVerificationEmail() async {
+    try {
+      await account.createVerification(
+        url: 'https://rpgirl2.vercel.app/verify', // Replace with your actual URL
+      );
+    } catch (e) {
+      throw Exception('Failed to send verification email: $e');
+    }
+  }
+
+  Future<void> verifyEmail(String secret) async {
+    try {
+      await account.updateVerification(
+        userId: ID.unique(), // You might need to get the current user ID
+        secret: secret,
+      );
+    } catch (e) {
+      throw Exception('Email verification failed: $e');
     }
   }
 

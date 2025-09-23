@@ -43,7 +43,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     setState(() {
-      _isLoading = true;
+    _isLoading = true;
     });
 
     try {
@@ -54,12 +54,21 @@ class _SignupScreenState extends State<SignupScreen> {
         _usernameController.text.trim(),
       );
       
-      // Navigate to home after successful registration
-      Navigator.pushNamedAndRemoveUntil(
-        context, 
-        '/home', 
-        (route) => false
-      );
+      // Check if user needs verification
+      final isVerified = await authService.isEmailVerified();
+      
+      if (isVerified) {
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/home', 
+          (route) => false
+        );
+      } else {
+        // Send verification email and show verification page
+        await authService.sendVerificationEmail();
+        // You'll need to pass a callback to SignupScreen similar to LoginPage
+        // widget.onVerificationNeeded();
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration failed: $e')),
@@ -298,7 +307,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.zero,
                                 side: BorderSide(
-                                    color: Color(0xff808080), width: 1),
+                                    color: Colors.transparent, width: 0),
                               ),
                               padding: EdgeInsets.symmetric(
                                   vertical: 16, horizontal: 0),

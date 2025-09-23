@@ -7,9 +7,14 @@ import 'package:rpgirl2/config/auth_service.dart';
 import 'package:fluttericon/rpg_awesome_icons.dart';
 
 class LoginPage extends StatefulWidget {
-  final VoidCallback onSignUpPressed; // Add this line
+  final VoidCallback onSignUpPressed;
+  final VoidCallback onVerificationNeeded; // Add this callback
 
-  const LoginPage({super.key, required this.onSignUpPressed}); // Modify constructor
+  const LoginPage({
+    super.key, 
+    required this.onSignUpPressed,
+    required this.onVerificationNeeded, // Add to constructor
+  });
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -19,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _login() async {
     setState(() {
@@ -29,12 +35,22 @@ class _LoginPageState extends State<LoginPage> {
       final authService = Provider.of<AuthService>(context, listen: false);
       await authService.login(_emailController.text, _passwordController.text);
       
-      // Navigate to home and clear all previous routes
-      Navigator.pushNamedAndRemoveUntil(
-        context, 
-        '/home', 
-        (route) => false
-      );
+      // Check if user has verified their email
+      final isVerified = await authService.isEmailVerified();
+      
+      if (isVerified) {
+        // User is verified, navigate to home
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/home', 
+          (route) => false
+        );
+      } else {
+        // User needs verification, send email and show verification page
+        await authService.sendVerificationEmail();
+        widget.onVerificationNeeded(); // Navigate to verification page
+      }
+      
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $e')),
@@ -44,6 +60,12 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = false;
       });
     }
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
   }
 
   @override
@@ -117,49 +139,54 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        textAlign: TextAlign.start,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 14,
-                          color: Color(0xff000000),
-                        ),
-                        decoration: InputDecoration(
-                          disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24.0),
-                            borderSide:
-                                BorderSide(color: Color(0x00ffffff), width: 1),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24.0),
-                            borderSide:
-                                BorderSide(color: Color(0x00ffffff), width: 1),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24.0),
-                            borderSide:
-                                BorderSide(color: Color(0x00ffffff), width: 1),
-                          ),
-                          hintText: "Password",
-                          hintStyle: TextStyle(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          textAlign: TextAlign.start,
+                          maxLines: 1,
+                          style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontStyle: FontStyle.normal,
                             fontSize: 14,
                             color: Color(0xff000000),
                           ),
-                          filled: true,
-                          fillColor: Color(0xfff2f2f3),
-                          isDense: false,
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          suffixIcon: Icon(FontAwesome5.eye_slash,
-                              color: Color(0xff212435), size: 24),
-                              
+                          decoration: InputDecoration(
+                            disabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.0),
+                              borderSide: BorderSide(
+                                  color: Color(0x00ffffff), width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.0),
+                              borderSide: BorderSide(
+                                  color: Color(0x00ffffff), width: 1),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.0),
+                              borderSide: BorderSide(
+                                  color: Color(0x00ffffff), width: 1),
+                            ),
+                            hintText: "Password",
+                            hintStyle: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14,
+                              color: Color(0xff000000),
+                            ),
+                            filled: true,
+                            fillColor: Color(0xfff2f2f3),
+                            isDense: false,
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 12),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                color: Color(0xff97989a),
+                                size: 24,
+                              ),
+                              onPressed: _togglePasswordVisibility,
+                            ),
+                          ),
                         ),
-                      ),
                       Align(
                         alignment: Alignment.centerRight,
                         child: MaterialButton(
@@ -230,7 +257,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         MaterialButton(
-                          onPressed: widget.onSignUpPressed, // Use the callback here
+                          onPressed: widget.onSignUpPressed,
                           color: Color(0x00ffffff),
                           elevation: 0,
                           shape: RoundedRectangleBorder(

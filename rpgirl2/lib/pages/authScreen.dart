@@ -42,9 +42,12 @@ class Authpage extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    verificationPage(),
-                    LoginPage(onSignUpPressed: () => _changePage(2)),
-                    SignupScreen(onSignInPressed: () => _changePage(1)), // Add callback here
+                    verifyPage(),
+                    LoginPage(
+                      onSignUpPressed: () => _changePage(2),
+                      onVerificationNeeded: () => _changePage(0), // Add this
+                    ),
+                    SignupScreen(onSignInPressed: () => _changePage(1)),
                   ],
                 ),
               ],
