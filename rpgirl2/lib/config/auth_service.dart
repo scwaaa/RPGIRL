@@ -1,11 +1,16 @@
 // auth_service.dart
+import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+import 'package:appwrite/models.dart' as models;
+import 'package:rpgirl2/models/user_model.dart'; // Add this import
 
-class AuthService {
+class AuthService extends ChangeNotifier { // Changed to extend ChangeNotifier
   final Account account;
+  UserModel? _currentUser;
 
   AuthService({required this.account});
+
+  UserModel? get currentUser => _currentUser;
 
   Future<void> register(String email, String password, String name) async {
     try {
@@ -16,8 +21,9 @@ class AuthService {
         name: name,
       );
       
-      // Automatically log in after registration
       await account.createEmailPasswordSession(email: email, password: password);
+      await _fetchCurrentUser();
+      notifyListeners();
     } catch (e) {
       throw Exception('Registration failed: $e');
     }
@@ -26,12 +32,24 @@ class AuthService {
   Future<void> login(String email, String password) async {
     try {
       await account.createEmailPasswordSession(email: email, password: password);
+      await _fetchCurrentUser();
+      notifyListeners();
     } catch (e) {
       throw Exception('Login failed: $e');
     }
   }
 
-  Future<User> getCurrentUser() async {
+  Future<void> _fetchCurrentUser() async {
+    try {
+      final models.User user = await account.get();
+      _currentUser = UserModel.fromAppwriteUser(user);
+    } catch (e) {
+      _currentUser = null;
+      throw Exception('Failed to fetch user: $e');
+    }
+  }
+
+  Future<models.User> getCurrentUser() async {
     try {
       return await account.get();
     } catch (e) {
@@ -51,7 +69,7 @@ class AuthService {
   Future<void> sendVerificationEmail() async {
     try {
       await account.createVerification(
-        url: 'https://rpgirl2.vercel.app/verify', // Replace with your actual URL
+        url: 'https://rpgirl2.vercel.app/verify',
       );
     } catch (e) {
       throw Exception('Failed to send verification email: $e');
@@ -61,9 +79,11 @@ class AuthService {
   Future<void> verifyEmail(String secret) async {
     try {
       await account.updateVerification(
-        userId: ID.unique(), // You might need to get the current user ID
+        userId: ID.unique(),
         secret: secret,
       );
+      await _fetchCurrentUser();
+      notifyListeners();
     } catch (e) {
       throw Exception('Email verification failed: $e');
     }
@@ -72,6 +92,8 @@ class AuthService {
   Future<void> logout() async {
     try {
       await account.deleteSession(sessionId: 'current');
+      _currentUser = null;
+      notifyListeners();
     } catch (e) {
       throw Exception('Logout failed: $e');
     }
@@ -80,9 +102,18 @@ class AuthService {
   Future<bool> isLoggedIn() async {
     try {
       await account.get();
+      if (_currentUser == null) {
+        await _fetchCurrentUser();
+      }
       return true;
     } catch (e) {
+      _currentUser = null;
       return false;
     }
+  }
+
+  Future<void> refreshUserData() async {
+    await _fetchCurrentUser();
+    notifyListeners();
   }
 }

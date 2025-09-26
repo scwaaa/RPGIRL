@@ -1,3 +1,4 @@
+// HomeBase.dart
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
@@ -7,7 +8,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:rpgirl2/pages/homepages/MyProfile.dart';
 import 'package:rpgirl2/pages/homepages/play.dart';
 import 'package:rpgirl2/pages/homepages/search.dart';
-import 'package:rpgirl2/pages/homepages/Custom_Drawer.dart'; // Import the custom drawer
+import 'package:rpgirl2/pages/homepages/Custom_Drawer.dart';
 
 void main() => runApp(MaterialApp(
     builder: (context, child) {
@@ -27,22 +28,22 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 1; // Start with PlayPage (index 1)
   final PageController _pageController = PageController(
     initialPage: 1,
   );
   bool _isBottomMenuOpen = false;
 
   final List<Widget> _pages = [
-    MyProfilePage(),
-    PlayPage(),
-    SearchPage(),
+    MyProfilePage(),    // Index 0
+    PlayPage(),         // Index 1  
+    SearchPage(),       // Index 2
   ];
   
   final List<String> _appBarTitles = [
-    'My Profile',
-    'RPGIRL',
-    'Search'
+    'My Profile',       // Index 0
+    'RPGIRL',           // Index 1
+    'Search'            // Index 2
   ];
 
   @override
@@ -50,7 +51,7 @@ class _HomeState extends State<Home> {
     super.initState();
     _pageController.addListener(() {
       final page = _pageController.page?.round();
-      if (page != null && page != _selectedIndex) {
+      if (page != null && page >= 0 && page < _pages.length && page != _selectedIndex) {
         setState(() {
           _selectedIndex = page;
           _isBottomMenuOpen = false;
@@ -71,12 +72,20 @@ class _HomeState extends State<Home> {
     });
   }
 
+  // Safe method to get app bar title
+  String _getAppBarTitle() {
+    if (_selectedIndex >= 0 && _selectedIndex < _appBarTitles.length) {
+      return _appBarTitles[_selectedIndex];
+    }
+    return 'RPGIRL'; // Default title
+  }
+
   // Helper method to get the nav index from page index
   int _getNavIndexFromPageIndex(int pageIndex) {
     switch (pageIndex) {
       case 0: // MyProfilePage
         return 0;
-      case 2: // DiscoveryPage
+      case 2: // SearchPage
         return 1;
       default: // PlayPage or others
         return -1; // No selection in nav bar
@@ -85,13 +94,12 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 20,
         centerTitle: true,
-        title: Text(_appBarTitles[_selectedIndex],
+        title: Text(_getAppBarTitle(), // Use safe method
           style: TextStyle(color: Colors.white),
         ),
         leading: Builder(
@@ -111,9 +119,7 @@ class _HomeState extends State<Home> {
             color: Color(0xffffffff),
             iconSize: 30,
             onPressed: () {
-              Navigator.of(context).pushNamed(
-                          '/friends',
-                        );
+              Navigator.of(context).pushNamed('/friends');
             },
           ),
           IconButton(
@@ -122,9 +128,7 @@ class _HomeState extends State<Home> {
             iconSize: 30,
             padding: EdgeInsets.fromLTRB(8, 0, 16, 0),
             onPressed: () {
-              Navigator.of(context).pushNamed(
-                          '/messages',
-                        );
+              Navigator.of(context).pushNamed('/messages');
             },
           ),
         ],
@@ -132,17 +136,20 @@ class _HomeState extends State<Home> {
       ),
       drawer: Drawer(
         child: CustomDrawer(),
-      ), // Using the custom drawer
+      ),
       body: Stack(
         children: [
           PageView(
             controller: _pageController,
             physics: ClampingScrollPhysics(),
             onPageChanged: (index) {
-              setState(() {
-                _selectedIndex = index;
-                _isBottomMenuOpen = false;
-              });
+              // Ensure index is within valid range
+              if (index >= 0 && index < _pages.length) {
+                setState(() {
+                  _selectedIndex = index;
+                  _isBottomMenuOpen = false;
+                });
+              }
             },
             children: _pages,
           ),
@@ -181,23 +188,17 @@ class _HomeState extends State<Home> {
                   children: [
                     _buildMenuItem(RpgAwesome.player, 'Practice', () {
                       _toggleBottomMenu();
-                       Navigator.of(context).pushNamed(
-                          '/quickplay',
-                        );
+                      Navigator.of(context).pushNamed('/quickplay');
                     }),
                     Divider(height: 1),
                     _buildMenuItem(Icons.gamepad, 'Create / Join Room', () {
                       _toggleBottomMenu();
-                      Navigator.of(context).pushNamed(
-                          '/quickplay',
-                        );
+                      Navigator.of(context).pushNamed('/quickplay');
                     }),
                     Divider(height: 1),
                     _buildMenuItem(RpgAwesome.crossed_swords, 'Event', () {
                       _toggleBottomMenu();
                     }),
-                    
-                    
                   ],
                 ),
               ),
@@ -205,10 +206,11 @@ class _HomeState extends State<Home> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           if (_selectedIndex == 1) {
             _toggleBottomMenu();
           } else {  
+            // Navigate to PlayPage (index 1)
             setState(() {
               _selectedIndex = 1;
               _isBottomMenuOpen = false;
@@ -257,18 +259,21 @@ class _HomeState extends State<Home> {
               onTabChange: (index) {
                 // Map navigation indices to page indices:
                 // Nav index 0 -> Page index 0 (MyProfilePage)
-                // Nav index 1 -> Page index 2 (DiscoveryPage)
+                // Nav index 1 -> Page index 2 (SearchPage)
                 int pageIndex = index == 0 ? 0 : 2;
                 
-                setState(() {
-                  _selectedIndex = pageIndex;
-                  _isBottomMenuOpen = false;
-                });
-                _pageController.animateToPage(
-                  pageIndex,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
+                // Ensure pageIndex is valid
+                if (pageIndex >= 0 && pageIndex < _pages.length) {
+                  setState(() {
+                    _selectedIndex = pageIndex;
+                    _isBottomMenuOpen = false;
+                  });
+                  _pageController.animateToPage(
+                    pageIndex,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
               },
             ),
           ),

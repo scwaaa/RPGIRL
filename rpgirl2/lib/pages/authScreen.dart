@@ -1,58 +1,49 @@
-// Authpage.dart
+// authScreen.dart
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:rpgirl2/pages/LoginPage.dart';
-import 'package:rpgirl2/pages/verificationPage.dart';
-import 'package:rpgirl2/pages/SignupPage.dart';
+import 'package:rpgirl2/pages/SignupPage.dart'; // Make sure this import is correct
 
-class Authpage extends StatelessWidget {
-  final pageController = PageController(
-    initialPage: 1,
-  );
+class Authpage extends StatefulWidget {
+  const Authpage({super.key});
 
-  void _changePage(int index) {
-    pageController.animateToPage(
-      index,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+  @override
+  State<Authpage> createState() => _AuthpageState();
+}
+
+class _AuthpageState extends State<Authpage> {
+  bool showLogin = true;
+  bool showVerification = false;
+
+  void toggleView() {
+    setState(() {
+      showLogin = !showLogin;
+      showVerification = false;
+    });
+  }
+
+  void showVerificationScreen() {
+    // For now, show a snackbar. You can implement a proper verification page later.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Verification email sent! Please check your inbox.')),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff8a0ad5),
       body: Stack(
-        alignment: Alignment.center,
         children: [
-          Lottie.network(
-            "https://lottie.host/25d91c54-8cb0-4bd2-bdb2-d5622a3bebbb/jxeDFH40aG.json",
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            fit: BoxFit.cover,
-            repeat: true,
-            animate: true,
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Stack(
-              children: [
-                PageView(
-                  controller: pageController,
-                  scrollDirection: Axis.horizontal,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    verifyPage(),
-                    LoginPage(
-                      onSignUpPressed: () => _changePage(2),
-                      onVerificationNeeded: () => _changePage(0), // Add this
-                    ),
-                    SignupScreen(onSignInPressed: () => _changePage(1)),
-                  ],
-                ),
-              ],
+          if (showLogin)
+            LoginPage(
+              onSignUpPressed: toggleView,
+              onVerificationNeeded: showVerificationScreen,
+            )
+          else
+            SignupScreen(
+              onSignInPressed: toggleView, // This matches the parameter name
+              onVerificationNeeded: showVerificationScreen,
             ),
-          ),
         ],
       ),
     );

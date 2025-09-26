@@ -5,8 +5,13 @@ import 'package:rpgirl2/config/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   final VoidCallback onSignInPressed;
+  final VoidCallback onVerificationNeeded; // Add this parameter
 
-  const SignupScreen({super.key, required this.onSignInPressed});
+  const SignupScreen({
+    super.key, 
+    required this.onSignInPressed,
+    required this.onVerificationNeeded, // Add to constructor
+  });
 
   @override
   _SignupScreenState createState() => _SignupScreenState();
@@ -42,8 +47,9 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    if (!mounted) return;
     setState(() {
-    _isLoading = true;
+      _isLoading = true;
     });
 
     try {
@@ -54,10 +60,15 @@ class _SignupScreenState extends State<SignupScreen> {
         _usernameController.text.trim(),
       );
       
+      if (!mounted) return;
+      
       // Check if user needs verification
       final isVerified = await authService.isEmailVerified();
       
+      if (!mounted) return;
+      
       if (isVerified) {
+        // User is verified, navigate to home
         Navigator.pushNamedAndRemoveUntil(
           context, 
           '/home', 
@@ -66,24 +77,37 @@ class _SignupScreenState extends State<SignupScreen> {
       } else {
         // Send verification email and show verification page
         await authService.sendVerificationEmail();
-        // You'll need to pass a callback to SignupScreen similar to LoginPage
-        // widget.onVerificationNeeded();
+        if (!mounted) return;
+        widget.onVerificationNeeded(); // Use the callback
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration failed: $e')),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   void _togglePasswordVisibility() {
-    setState(() {
-      _obscurePassword = !_obscurePassword;
-    });
+    if (mounted) {
+      setState(() {
+        _obscurePassword = !_obscurePassword;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -183,12 +207,12 @@ class _SignupScreenState extends State<SignupScreen> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22.0),
                             borderSide:
-                                BorderSide(color: Color(0x00ffffff), width: 1),
+                                BorderSide(color: Color(0x00ffffff), width:1),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22.0),
                             borderSide:
-                                BorderSide(color: Color(0x00ffffff), width: 1),
+                                BorderSide(color: Color(0x00ffffff), width:1),
                           ),
                           hintText: "Email",
                           hintStyle: TextStyle(

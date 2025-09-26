@@ -1,8 +1,7 @@
-// route_generator.dart
+// lib/routeGenerator.dart
 import 'package:flutter/material.dart';
 import 'package:rpgirl2/config/auth_wrapper.dart';
-import 'package:rpgirl2/pages/HomeBase.dart';
-import 'package:rpgirl2/pages/LoginPage.dart';
+import 'package:rpgirl2/pages/main_app_screen.dart';
 import 'package:rpgirl2/pages/homepages/inventory.dart';
 import 'package:rpgirl2/pages/homepages/social.dart';
 import 'package:rpgirl2/pages/homepages/messages.dart';
@@ -18,7 +17,7 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (_) => AuthWrapper());
       case '/home':
-        return MaterialPageRoute(builder: (_) => Home());
+        return MaterialPageRoute(builder: (_) => MainAppScreen());
       case "/inventory":
         return MaterialPageRoute(builder: (_) => InventoryPage());
       case "/friends":
@@ -39,12 +38,8 @@ class RouteGenerator {
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(builder: (_) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('Error'),
-        ),
-        body: Center(
-          child: Text('ERROR'),
-        ),
+        appBar: AppBar(title: Text('Error')),
+        body: Center(child: Text('Page not found!')),
       );
     });
   }

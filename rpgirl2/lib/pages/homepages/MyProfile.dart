@@ -1,13 +1,34 @@
-///File download from FlutterViz- Drag and drop a tools. For more details visit https://flutterviz.io/
-library;
-
+// MyProfile.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rpgirl2/config/auth_service.dart';
+import 'package:rpgirl2/models/user_model.dart';
 
 class MyProfilePage extends StatelessWidget {
   const MyProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final user = authService.currentUser;
+
+    // Show loading if user data is not yet loaded
+    if (user == null) {
+      return Scaffold(
+        backgroundColor: Color(0xffffffff),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading profile...'),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Color(0xffffffff),
       body: Stack(
@@ -31,17 +52,20 @@ class MyProfilePage extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       child: Image.network(
-                          "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png",
-                          fit: BoxFit.cover),
+                        "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
+                  
+                  // User Info Section with dynamic data
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Rohit Tota",
+                        user.name, // Dynamic user name from provider
                         textAlign: TextAlign.start,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
@@ -51,8 +75,9 @@ class MyProfilePage extends StatelessWidget {
                           color: Color(0xff000000),
                         ),
                       ),
+                      SizedBox(width: 8),
                       Text(
-                        "ID",
+                        "ID: ${user.id.substring(0, 8)}...", // Dynamic user ID
                         textAlign: TextAlign.start,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
@@ -64,6 +89,34 @@ class MyProfilePage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  
+                  // Email and verification status
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Email: ${user.email}", // Dynamic email
+                        textAlign: TextAlign.start,
+                        overflow: TextOverflow.clip,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                          fontSize: 12,
+                          color: Color(0xff000000),
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(
+                        user.isEmailVerified ? Icons.verified : Icons.verified,
+                        color: user.isEmailVerified ? Colors.green : Colors.orange,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                  
+                  // Level
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -93,19 +146,16 @@ class MyProfilePage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  
+                  // Tags/Chips Section
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
                     child: Wrap(
-                      //mainAxisAlignment: MainAxisAlignment.start,
-                      //crossAxisAlignment: CrossAxisAlignment.center,
-                      //mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 0, horizontal: 2),
+                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
                           child: Chip(
-                            labelPadding: EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 0),
+                            labelPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                             label: Text("Weebz"),
                             labelStyle: TextStyle(
                               fontSize: 10,
@@ -122,11 +172,9 @@ class MyProfilePage extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 0, horizontal: 2),
+                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
                           child: Chip(
-                            labelPadding: EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 0),
+                            labelPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                             label: Text("The Loop"),
                             labelStyle: TextStyle(
                               fontSize: 10,
@@ -143,11 +191,9 @@ class MyProfilePage extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 0, horizontal: 2),
+                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
                           child: Chip(
-                            labelPadding: EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 0),
+                            labelPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                             label: Text("Beta"),
                             labelStyle: TextStyle(
                               fontSize: 10,
@@ -166,11 +212,12 @@ class MyProfilePage extends StatelessWidget {
                       ],
                     ),
                   ),
+                  
+                  // Stats Progress Bars
                   Container(
                     margin: EdgeInsets.all(0),
                     padding: EdgeInsets.all(0),
-                    width:
-                        MediaQuery.of(context).size.width * 0.7000000000000001,
+                    width: MediaQuery.of(context).size.width * 0.7000000000000001,
                     decoration: BoxDecoration(
                       color: Color(0x00c9c5c5),
                       shape: BoxShape.rectangle,
@@ -213,8 +260,7 @@ class MyProfilePage extends StatelessWidget {
                               flex: 1,
                               child: LinearProgressIndicator(
                                   backgroundColor: Color(0xff808080),
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0xff24ee0d)),
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xff24ee0d)),
                                   value: 0.5,
                                   minHeight: 17),
                             ),
@@ -252,8 +298,7 @@ class MyProfilePage extends StatelessWidget {
                               flex: 1,
                               child: LinearProgressIndicator(
                                   backgroundColor: Color(0xff808080),
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0xff3a57e8)),
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xff3a57e8)),
                                   value: 0.5,
                                   minHeight: 17),
                             ),
@@ -291,8 +336,7 @@ class MyProfilePage extends StatelessWidget {
                               flex: 1,
                               child: LinearProgressIndicator(
                                   backgroundColor: Color(0xff808080),
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Color(0xfff7c203)),
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff7c203)),
                                   value: 0.5,
                                   minHeight: 17),
                             ),
@@ -301,6 +345,8 @@ class MyProfilePage extends StatelessWidget {
                       ],
                     ),
                   ),
+                  
+                  // Stats Numbers
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 30, 0, 16),
                     child: Row(
@@ -352,8 +398,7 @@ class MyProfilePage extends StatelessWidget {
                             color: Color(0xff8a0ad5),
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.zero,
-                            border:
-                                Border.all(color: Color(0x4d9e9e9e), width: 1),
+                            border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                           ),
                         ),
                         Expanded(
@@ -400,8 +445,7 @@ class MyProfilePage extends StatelessWidget {
                             color: Color(0xff8a0ad5),
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.zero,
-                            border:
-                                Border.all(color: Color(0x4d9e9e9e), width: 1),
+                            border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                           ),
                         ),
                         Expanded(
@@ -442,59 +486,58 @@ class MyProfilePage extends StatelessWidget {
                       ],
                     ),
                   ),
+                  
+                  // Action Buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-                    child: MaterialButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          '/inventory',
-                          arguments: 'Hello there from the first page!',
-                        );
-                      },
-                      color: Color(0xFFAE69D5),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        side: BorderSide(color: Color(0xff808080), width: 1),
-                      ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      textColor: Color(0xffffffff),
-                      height: 40,
-                      minWidth: MediaQuery.of(context).size.width * 0.4,
-                      child: Text(
-                        "Inventory",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
+                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+                        child: MaterialButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              '/inventory',
+                              arguments: 'Hello there from the first page!',
+                            );
+                          },
+                          color: Color(0xFFAE69D5),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: BorderSide(color: Color(0xff808080), width: 1),
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          textColor: Color(0xffffffff),
+                          height: 40,
+                          minWidth: MediaQuery.of(context).size.width * 0.4,
+                          child: Text(
+                            "Inventory",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              fontStyle: FontStyle.normal,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
                       Padding(
                         padding: EdgeInsets.all(4),
                         child: MaterialButton(
                           onPressed: () {
                             Navigator.of(context).pushNamed(
-                          '/friends',
-                          arguments: 'Hello there from the first page!',
-                        );
+                              '/friends',
+                              arguments: 'Hello there from the first page!',
+                            );
                           },
                           color: Color(0xffae69d5),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
-                            side:
-                                BorderSide(color: Color(0xff808080), width: 1),
+                            side: BorderSide(color: Color(0xff808080), width: 1),
                           ),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           textColor: Color(0xffffffff),
                           height: 40,
                           minWidth: MediaQuery.of(context).size.width * 0.4,
@@ -511,6 +554,7 @@ class MyProfilePage extends StatelessWidget {
                     ],
                   ),
                   
+                  // Badges Section
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 0),
                     child: Text(
@@ -555,8 +599,7 @@ class MyProfilePage extends StatelessWidget {
                             color: Color(0x937792d9),
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.zero,
-                            border:
-                                Border.all(color: Color(0x4d9e9e9e), width: 1),
+                            border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -590,8 +633,7 @@ class MyProfilePage extends StatelessWidget {
                             color: Color(0x1f000000),
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.zero,
-                            border:
-                                Border.all(color: Color(0x4d9e9e9e), width: 1),
+                            border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -627,8 +669,7 @@ class MyProfilePage extends StatelessWidget {
                             color: Color(0x1f000000),
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.zero,
-                            border:
-                                Border.all(color: Color(0x4d9e9e9e), width: 1),
+                            border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -656,6 +697,32 @@ class MyProfilePage extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  
+                  // Refresh Data Button
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: MaterialButton(
+                      onPressed: () {
+                        authService.refreshUserData();
+                      },
+                      color: Color(0xFFAE69D5),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        side: BorderSide(color: Color(0xff808080), width: 1),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      textColor: Color(0xffffffff),
+                      child: Text(
+                        "Refresh Data",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                        ),
+                      ),
                     ),
                   ),
                 ],

@@ -1,4 +1,4 @@
-// custom_drawer.dart
+// custom_drawer.dart (Simplified)
 import 'package:flutter/material.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +9,9 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final user = authService.currentUser;
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -23,15 +26,24 @@ class CustomDrawer extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 30,
-                  child: Icon(
-                    Icons.person,
-                    size: 30,
-                    color: const Color.fromARGB(255, 139, 10, 213),
-                  ),
+                  child: user != null 
+                      ? ClipOval(
+                          child: Image.network(
+                            "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png",
+                            width: 54,
+                            height: 54,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Icon(
+                          Icons.person,
+                          size: 30,
+                          color: const Color.fromARGB(255, 139, 10, 213),
+                        ),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Username',
+                  user?.name ?? 'Loading...',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -39,11 +51,29 @@ class CustomDrawer extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'user@example.com',
+                  user?.email ?? 'Loading email...',
                   style: TextStyle(
                     color: Colors.white70,
                   ),
                 ),
+                /*if (user != null) 
+                  Row(
+                    children: [
+                      Icon(
+                        user.isEmailVerified ? Icons.verified : Icons.email,
+                        color: user.isEmailVerified ? Colors.green : Colors.orange,
+                        size: 14,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        user.isEmailVerified ? 'Verified' : 'Unverified',
+                        style: TextStyle(
+                          color: user.isEmailVerified ? Colors.green : Colors.orange,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),*/
               ],
             ),
           ),
@@ -53,9 +83,7 @@ class CustomDrawer extends StatelessWidget {
             title: Text('Inventory'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).pushNamed(
-                          '/inventory',
-                        );
+              Navigator.of(context).pushNamed('/inventory');
             },
           ),
           ListTile(
@@ -63,19 +91,15 @@ class CustomDrawer extends StatelessWidget {
             title: Text('Social'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).pushNamed(
-                          '/friends',
-                        );
+              Navigator.of(context).pushNamed('/friends');
             },
           ),
-           ListTile(
+          ListTile(
             leading: Icon(FontAwesome5.comments, color: const Color.fromARGB(255, 139, 10, 213)),
-            title: Text('Messagaes'),
+            title: Text('Messages'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).pushNamed(
-                          '/messages',
-                        );
+              Navigator.of(context).pushNamed('/messages');
             },
           ),
           ListTile(
@@ -83,9 +107,7 @@ class CustomDrawer extends StatelessWidget {
             title: Text('Settings'),
             onTap: () {
               Navigator.pop(context);
-               Navigator.of(context).pushNamed(
-                          '/settings',
-                        );
+              Navigator.of(context).pushNamed('/settings');
             },
           ),
           Divider(),
@@ -115,7 +137,7 @@ class CustomDrawer extends StatelessWidget {
               }
             },
           ),
-          ],
+        ],
       ),
     );
   }
