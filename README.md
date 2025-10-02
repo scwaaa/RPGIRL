@@ -137,7 +137,8 @@ graph TD
 | Component | Status | Notes |
 |-----------|--------|-------|
 | Hardware | 🟡 Planning | Initial designs in progress |
-| Flutter App | 🟡 Planning | Basic structure defined |
+| Flutter App | 🟠 in Progress | Basic structure defined |
+| Flutter Web App | 🟡 Planning | Initial designs in progress |
 | Firmware | 🟡 Planning | BLE stack research |
 | Game Server | ⚪ Not Started | Architecture planning |
 
