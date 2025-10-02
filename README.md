@@ -29,7 +29,7 @@ Trace-Weavers possess the innate ability to sense and interact with the Magitrac
 
 ### The Conduits (The Blasters)
 
-A Conduit is not a weapon; it is an **interface device**. It translates a Weaver's intent into executable commands that manipulate the Magitrace.
+Based on the OFD flycore, a Conduit is not a weapon; it is an **interface device**. It translates a Weaver's intent into executable commands that manipulate the Magitrace.
 
 **Conduit Types:**
 - **Precision Loom** (Rifle-style blasters) - Designed for accurate, long-range weaves
