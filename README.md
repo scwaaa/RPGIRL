@@ -119,6 +119,7 @@ graph TD
 
 **Component Responsibilities:**
 - **📱 Flutter App:** GPS, UI, game logic, spell programming interface
+- **💻 Flutter Web App:** Account management, Geofencing, event creation, data analysis
 - **⚙️ nRF52840 Firmware:** Blaster control, BLE communication, sensor processing
 - **🌐 Game Server:** Player accounts, guild management, event orchestration
 
