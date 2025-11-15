@@ -107,7 +107,7 @@ class _PlayPageState extends State<PlayPage> {
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://maps.geoapify.com/v1/tile/toner-grey/{z}/{x}/{y}@2x.png?apiKey=b71d184b32ab42828fa025dd0f277544',
+                urlTemplate: 'https://maps.geoapify.com/v1/tile/dark-matter-purple-roads/{z}/{x}/{y}@2x.png?apiKey=b71d184b32ab42828fa025dd0f277544',
                 userAgentPackageName: 'com.example.rpgirl2',
               ),
               // Rectangle overlay layer

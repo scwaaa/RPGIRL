@@ -1,7 +1,7 @@
 // authScreen.dart
 import 'package:flutter/material.dart';
 import 'package:rpgirl2/pages/LoginPage.dart';
-import 'package:rpgirl2/pages/SignupPage.dart'; // Make sure this import is correct
+import 'package:rpgirl2/pages/SignupPage.dart';
 
 class Authpage extends StatefulWidget {
   const Authpage({super.key});
@@ -12,20 +12,11 @@ class Authpage extends StatefulWidget {
 
 class _AuthpageState extends State<Authpage> {
   bool showLogin = true;
-  bool showVerification = false;
 
   void toggleView() {
     setState(() {
       showLogin = !showLogin;
-      showVerification = false;
     });
-  }
-
-  void showVerificationScreen() {
-    // For now, show a snackbar. You can implement a proper verification page later.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Verification email sent! Please check your inbox.')),
-    );
   }
 
   @override
@@ -37,12 +28,10 @@ class _AuthpageState extends State<Authpage> {
           if (showLogin)
             LoginPage(
               onSignUpPressed: toggleView,
-              onVerificationNeeded: showVerificationScreen,
             )
           else
             SignupScreen(
-              onSignInPressed: toggleView, // This matches the parameter name
-              onVerificationNeeded: showVerificationScreen,
+              onSignInPressed: toggleView,
             ),
         ],
       ),

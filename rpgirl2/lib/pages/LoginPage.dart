@@ -1,18 +1,14 @@
 // LoginPage.dart
 import 'package:flutter/material.dart';
-import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:rpgirl2/config/auth_service.dart';
-import 'package:fluttericon/rpg_awesome_icons.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback onSignUpPressed;
-  final VoidCallback onVerificationNeeded;
 
   const LoginPage({
     super.key, 
     required this.onSignUpPressed,
-    required this.onVerificationNeeded,
   });
 
   @override
@@ -26,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
 
   Future<void> _login() async {
-    if (!mounted) return; // Check if widget is still mounted
+    if (!mounted) return;
     
     setState(() {
       _isLoading = true;
@@ -36,26 +32,14 @@ class _LoginPageState extends State<LoginPage> {
       final authService = Provider.of<AuthService>(context, listen: false);
       await authService.login(_emailController.text, _passwordController.text);
       
-      if (!mounted) return; // Check again after async operation
+      if (!mounted) return;
       
-      // Check if user has verified their email
-      final isVerified = await authService.isEmailVerified();
-      
-      if (!mounted) return; // Check again
-      
-      if (isVerified) {
-        // User is verified, navigate to home using Navigator
-        Navigator.pushNamedAndRemoveUntil(
-          context, 
-          '/home', 
-          (route) => false
-        );
-      } else {
-        // User needs verification
-        await authService.sendVerificationEmail();
-        if (!mounted) return;
-        widget.onVerificationNeeded();
-      }
+      // Navigate directly to home on successful login
+      Navigator.pushNamedAndRemoveUntil(
+        context, 
+        '/home', 
+        (route) => false
+      );
       
     } catch (e) {
       if (!mounted) return;
@@ -112,7 +96,6 @@ class _LoginPageState extends State<LoginPage> {
                         width: 240,
                         fit: BoxFit.contain,
                       ),
-                      // ... rest of your login form UI remains the same
                       Padding(
                         padding: EdgeInsets.fromLTRB(0, 50, 0, 8),
                         child: TextField(
@@ -167,7 +150,27 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text("LOGIN"),
                               ),
                       ),
-                      // ... rest of your UI
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account?",
+                            style: TextStyle(
+                              color: Color(0xffe2dcdc),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: widget.onSignUpPressed,
+                            child: Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                color: Color(0xffffffff),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),

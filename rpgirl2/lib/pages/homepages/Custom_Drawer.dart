@@ -1,11 +1,29 @@
-// custom_drawer.dart (Simplified)
+// lib/pages/homepages/custom_drawer.dart
 import 'package:flutter/material.dart';
-import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:rpgirl2/config/auth_service.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
+    try {
+      await authService.logout();
+      
+      // Use Navigator with a context that's guaranteed to be available
+      Navigator.of(context).pushNamedAndRemoveUntil('/auth', (route) => false);
+    } catch (e) {
+      // Handle logout error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Logout failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,127 +33,75 @@ class CustomDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 139, 10, 213),
+        children: [
+          UserAccountsDrawerHeader(
+            accountName: Text(user?.name ?? 'User'),
+            accountEmail: Text(user?.email ?? 'email@example.com'),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: user?.profilePhotoUrl != null && user!.profilePhotoUrl!.isNotEmpty
+                  ? ClipOval(
+                      child: Image.network(
+                        user.profilePhotoUrl!,
+                        fit: BoxFit.cover,
+                        width: 60,
+                        height: 60,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.person,
+                            color: Colors.purple,
+                            size: 40,
+                          );
+                        },
+                      ),
+                    )
+                  : Icon(
+                      Icons.person,
+                      color: Colors.purple,
+                      size: 40,
+                    ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 30,
-                  child: user != null 
-                      ? ClipOval(
-                          child: Image.network(
-                            "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png",
-                            width: 54,
-                            height: 54,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : Icon(
-                          Icons.person,
-                          size: 30,
-                          color: const Color.fromARGB(255, 139, 10, 213),
-                        ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  user?.name ?? 'Loading...',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  user?.email ?? 'Loading email...',
-                  style: TextStyle(
-                    color: Colors.white70,
-                  ),
-                ),
-                /*if (user != null) 
-                  Row(
-                    children: [
-                      Icon(
-                        user.isEmailVerified ? Icons.verified : Icons.email,
-                        color: user.isEmailVerified ? Colors.green : Colors.orange,
-                        size: 14,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        user.isEmailVerified ? 'Verified' : 'Unverified',
-                        style: TextStyle(
-                          color: user.isEmailVerified ? Colors.green : Colors.orange,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),*/
-              ],
+            decoration: BoxDecoration(
+              color: Color(0xffae69d5),
             ),
           ),
-          
           ListTile(
-            leading: Icon(FontAwesome5.box, color: const Color.fromARGB(255, 139, 10, 213)),
+            leading: Icon(Icons.person),
+            title: Text('Profile'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/profile');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.inventory),
             title: Text('Inventory'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).pushNamed('/inventory');
+              Navigator.pushNamed(context, '/inventory');
             },
           ),
           ListTile(
-            leading: Icon(FontAwesome5.users, color: const Color.fromARGB(255, 139, 10, 213)),
-            title: Text('Social'),
+            leading: Icon(Icons.people),
+            title: Text('Friends'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).pushNamed('/friends');
+              Navigator.pushNamed(context, '/friends');
             },
           ),
           ListTile(
-            leading: Icon(FontAwesome5.comments, color: const Color.fromARGB(255, 139, 10, 213)),
-            title: Text('Messages'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.of(context).pushNamed('/messages');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.settings, color: const Color.fromARGB(255, 139, 10, 213)),
+            leading: Icon(Icons.settings),
             title: Text('Settings'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.of(context).pushNamed('/settings');
+              Navigator.pushNamed(context, '/settings');
             },
           ),
           Divider(),
           ListTile(
-            leading: Icon(Icons.help, color: const Color.fromARGB(255, 139, 10, 213)),
-            title: Text('Help & Support'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.logout, color: Color.fromARGB(255, 139, 10, 213)),
-            title: Text('Logout'),
-            onTap: () async {
-              try {
-                final authService = Provider.of<AuthService>(context, listen: false);
-                await authService.logout();
-                Navigator.pushNamedAndRemoveUntil(
-                  context, 
-                  '/', 
-                  (route) => false
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Logout failed: $e')),
-                );
-              }
-            },
+            leading: Icon(Icons.logout, color: Colors.red),
+            title: Text('Logout', style: TextStyle(color: Colors.red)),
+            onTap: () => _logout(context),
           ),
         ],
       ),

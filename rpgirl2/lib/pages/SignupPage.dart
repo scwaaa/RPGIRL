@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:rpgirl2/config/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   final VoidCallback onSignInPressed;
-  final VoidCallback onVerificationNeeded; // Add this parameter
 
   const SignupScreen({
     super.key, 
     required this.onSignInPressed,
-    required this.onVerificationNeeded, // Add to constructor
   });
 
   @override
@@ -62,24 +59,12 @@ class _SignupScreenState extends State<SignupScreen> {
       
       if (!mounted) return;
       
-      // Check if user needs verification
-      final isVerified = await authService.isEmailVerified();
-      
-      if (!mounted) return;
-      
-      if (isVerified) {
-        // User is verified, navigate to home
-        Navigator.pushNamedAndRemoveUntil(
-          context, 
-          '/home', 
-          (route) => false
-        );
-      } else {
-        // Send verification email and show verification page
-        await authService.sendVerificationEmail();
-        if (!mounted) return;
-        widget.onVerificationNeeded(); // Use the callback
-      }
+      // Navigate directly to home on successful registration
+      Navigator.pushNamedAndRemoveUntil(
+        context, 
+        '/home', 
+        (route) => false
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -306,47 +291,26 @@ class _SignupScreenState extends State<SignupScreen> {
                               height: 50,
                               minWidth: MediaQuery.of(context).size.width,
                             ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Already have an account?",
-                              textAlign: TextAlign.start,
-                              overflow: TextOverflow.clip,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account?",
+                            style: TextStyle(
+                              color: Color(0xffe2dcdc),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: widget.onSignInPressed,
+                            child: Text(
+                              "Sign In",
                               style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontStyle: FontStyle.normal,
-                                fontSize: 14,
-                                color: Color(0xffe2dcdc),
+                                color: Color(0xffffffff),
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            MaterialButton(
-                              onPressed: widget.onSignInPressed,
-                              color: Color(0x00ffffff),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero,
-                                side: BorderSide(
-                                    color: Colors.transparent, width: 0),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 0),
-                              child: Text(
-                                "Sign In",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  fontStyle: FontStyle.normal,
-                                ),
-                              ),
-                              textColor: Color(0xffffffff),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
