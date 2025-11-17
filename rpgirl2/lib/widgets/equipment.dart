@@ -84,7 +84,7 @@ class EquipmentPage extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   ),
                   child: Text(
-                    "Attunr",
+                    "Attune",
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.clip,
                     style: TextStyle(
