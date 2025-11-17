@@ -29,6 +29,9 @@ class MyProfilePage extends StatelessWidget {
       );
     }
 
+    // Calculate XP progress ratio
+    final xpProgress = user.maxXp > 0 ? user.currentXp / user.maxXp : 0.0;
+
     return Scaffold(
       backgroundColor: Color(0xffffffff),
       body: Stack(
@@ -116,7 +119,7 @@ class MyProfilePage extends StatelessWidget {
                     ],
                   ),
                   
-                  // Level
+                  // Level - Updated with database attribute
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -134,7 +137,7 @@ class MyProfilePage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "1",
+                        "${user.level}", // Dynamic level from database
                         textAlign: TextAlign.start,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
@@ -147,16 +150,17 @@ class MyProfilePage extends StatelessWidget {
                     ],
                   ),
                   
-                  // Tags/Chips Section
+                  // Tags/Chips Section - Updated with teams and labels from database
                   Padding(
                     padding: EdgeInsets.fromLTRB(0, 8, 0, 4),
                     child: Wrap(
                       children: [
-                        Padding(
+                        // Teams chips
+                        ...user.teams.map((team) => Padding(
                           padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
                           child: Chip(
                             labelPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                            label: Text("Weebz"),
+                            label: Text(team),
                             labelStyle: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w400,
@@ -170,12 +174,13 @@ class MyProfilePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                           ),
-                        ),
-                        Padding(
+                        )).toList(),
+                        // Labels chips
+                        ...user.labels.map((label) => Padding(
                           padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
                           child: Chip(
                             labelPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                            label: Text("The Loop"),
+                            label: Text(label),
                             labelStyle: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w400,
@@ -189,156 +194,195 @@ class MyProfilePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16.0),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 2),
-                          child: Chip(
-                            labelPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                            label: Text("Beta"),
-                            labelStyle: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w400,
-                              fontStyle: FontStyle.normal,
-                              color: Color(0xffffffff),
-                            ),
-                            backgroundColor: Color(0xffae69d5),
-                            elevation: 0,
-                            shadowColor: Color(0xff808080),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                          ),
-                        ),
+                        )).toList(),
                       ],
                     ),
                   ),
                   
-                  // Stats Progress Bars
+                  // Circular Progress Bars in a row with XP in the middle - Updated with database data
                   Container(
                     margin: EdgeInsets.all(0),
-                    padding: EdgeInsets.all(0),
-                    width: MediaQuery.of(context).size.width * 0.7000000000000001,
+                    padding: EdgeInsets.all(16),
+                    width: MediaQuery.of(context).size.width * 0.9,
                     decoration: BoxDecoration(
                       color: Color(0x00c9c5c5),
                       shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.zero,
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Row(
+                        // HP Circular Progress - Updated with Max_health
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              alignment: Alignment.centerRight,
-                              margin: EdgeInsets.all(0),
-                              padding: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width * 0.1,
-                              height: 17,
-                              decoration: BoxDecoration(
-                                color: Color(0x00c9c5c5),
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.zero,
-                              ),
-                              child: Text(
-                                "HP:",
-                                textAlign: TextAlign.start,
-                                overflow: TextOverflow.clip,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 14,
-                                  color: Color(0xff000000),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Color(0xff808080),
+                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xff24ee0d)),
+                                    value: 1,
+                                    strokeWidth: 6,
+                                  ),
                                 ),
-                              ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "${user.maxHealth}", // Dynamic max health from database
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontStyle: FontStyle.normal,
+                                        fontSize: 10,
+                                        color: Color(0xff000000),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: LinearProgressIndicator(
-                                  backgroundColor: Color(0xff808080),
-                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xff24ee0d)),
-                                  value: 0.5,
-                                  minHeight: 17),
+                            SizedBox(height: 8),
+                            Text(
+                              "HP",
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                color: Color(0xff000000),
+                              ),
                             ),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                        
+                        // XP Circular Progress (Middle) - Updated with current_xp and max_xp
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              alignment: Alignment.centerRight,
-                              margin: EdgeInsets.all(0),
-                              padding: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width * 0.1,
-                              height: 17,
-                              decoration: BoxDecoration(
-                                color: Color(0x00000000),
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.zero,
-                              ),
-                              child: Text(
-                                "MP:",
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.clip,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 14,
-                                  color: Color(0xff000000),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 80,
+                                  height: 80,
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Color(0xff808080),
+                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff7c203)),
+                                    value: xpProgress, // Dynamic XP progress ratio
+                                    strokeWidth: 8,
+                                  ),
                                 ),
-                              ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "${user.currentXp}", // Dynamic current XP
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontStyle: FontStyle.normal,
+                                        fontSize: 14,
+                                        color: Color(0xff000000),
+                                      ),
+                                    ),
+                                    Text(
+                                      "/${user.maxXp}", // Dynamic max XP
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontStyle: FontStyle.normal,
+                                        fontSize: 12,
+                                        color: Color(0xff000000),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: LinearProgressIndicator(
-                                  backgroundColor: Color(0xff808080),
-                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xff3a57e8)),
-                                  value: 0.5,
-                                  minHeight: 17),
+                            SizedBox(height: 8),
+                            Text(
+                              "XP",
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                color: Color(0xff000000),
+                              ),
                             ),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                        
+                        // MP Circular Progress - Updated with max_mana
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              alignment: Alignment.centerRight,
-                              margin: EdgeInsets.all(0),
-                              padding: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width * 0.1,
-                              height: 17,
-                              decoration: BoxDecoration(
-                                color: Color(0x00000000),
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.zero,
-                              ),
-                              child: Text(
-                                "XP:",
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.clip,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 14,
-                                  color: Color(0xff000000),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: Color(0xff808080),
+                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xff3a57e8)),
+                                    value: 1,
+                                    strokeWidth: 6,
+                                  ),
                                 ),
-                              ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "${user.maxMana}", // Dynamic max mana from database
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontStyle: FontStyle.normal,
+                                        fontSize: 10,
+                                        color: Color(0xff000000),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: LinearProgressIndicator(
-                                  backgroundColor: Color(0xff808080),
-                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff7c203)),
-                                  value: 0.5,
-                                  minHeight: 17),
+                            SizedBox(height: 8),
+                            Text(
+                              "MP",
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                color: Color(0xff000000),
+                              ),
                             ),
                           ],
                         ),

@@ -14,26 +14,29 @@ void main() {
       .setEndpoint("https://sfo.cloud.appwrite.io/v1")
       .setProject("68ba292d001f26db5160");
   Account account = Account(client);
+  Databases databases = Databases(client); // Add Databases client
 
-  runApp(MyApp(account: account));
+  runApp(MyApp(account: account, databases: databases)); // Pass databases to MyApp
 }
 
 class MyApp extends StatelessWidget {
   final Account account;
+  final Databases databases; // Add databases parameter
 
-  const MyApp({super.key, required this.account});
+  const MyApp({super.key, required this.account, required this.databases});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthService>(
-          create: (_) => AuthService(account: account),
+          create: (_) => AuthService(account: account, databases: databases), // Add databases here
         ),
         ChangeNotifierProvider<AppState>(
           create: (_) => AppState(),
         ),
         Provider<Account>(create: (_) => account),
+        Provider<Databases>(create: (_) => databases), // Add Databases provider
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
