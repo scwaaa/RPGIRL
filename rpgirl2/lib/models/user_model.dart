@@ -14,6 +14,7 @@ class UserModel {
   final int maxMana;
   final List<String> teams;
   final List<String> labels;
+  final List<String> badges; // Add badges field
 
   UserModel({
     required this.id,
@@ -28,6 +29,7 @@ class UserModel {
     required this.maxMana,
     required this.teams,
     required this.labels,
+    required this.badges, // Add to constructor
   });
 
   factory UserModel.fromAppwriteUser(models.User user) {
@@ -47,6 +49,7 @@ class UserModel {
       maxMana: prefs['max_mana'] ?? 100,
       teams: List<String>.from(prefs['teams'] ?? []),
       labels: List<String>.from(prefs['labels'] ?? []),
+      badges: List<String>.from(prefs['badges'] ?? []), // Add badges
     );
   }
 
@@ -63,6 +66,7 @@ class UserModel {
     int? maxMana,
     List<String>? teams,
     List<String>? labels,
+    List<String>? badges, // Add badges to copyWith
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -77,6 +81,7 @@ class UserModel {
       maxMana: maxMana ?? this.maxMana,
       teams: teams ?? this.teams,
       labels: labels ?? this.labels,
+      badges: badges ?? this.badges, // Add badges
     );
   }
 }
